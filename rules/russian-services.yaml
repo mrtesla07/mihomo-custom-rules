@@ -8,9 +8,9 @@ payload:
   - DOMAIN-SUFFIX,jivosite.com
   - DOMAIN-SUFFIX,vk.com
   - DOMAIN-SUFFIX,avira.com
-  - DOMAIN-SUFFIX,ru
-  - DOMAIN-SUFFIX,su
-  - DOMAIN-SUFFIX,by
+  - DOMAIN-KEYWORD,.ru
+  - DOMAIN-KEYWORD,.su
+  - DOMAIN-KEYWORD,.by
   - DOMAIN-SUFFIX,ru.com
   - DOMAIN-SUFFIX,ru.net
   - DOMAIN-SUFFIX,kudago.com

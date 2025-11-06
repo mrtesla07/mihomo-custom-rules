@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "domain_suffix": [
+        "yastatic.net",
+        "yandex.net",
+        "yandex.kz",
+        "yandex.com",
+        "yadi.sk",
+        "mycdn.me",
+        "jivosite.com",
+        "vk.com",
+        "avira.com",
+        "kudago.com",
+        "kinescope.io",
+        "redheadsound.studio",
+        "plplayer.online",
+        "lomont.site",
+        "remanga.org",
+        "shopstory.live"
+      ],
+      "domain_keyword": [
+        "avito",
+        "miradres",
+        "premier",
+        "shutterstock",
+        "2gis",
+        "diginetica",
+        "kinescopecdn",
+        "researchgate",
+        "springer",
+        "nextcloud",
+        "kaspersky",
+        "stepik",
+        "likee",
+        "snapchat",
+        "yappy",
+        "pikabu",
+        "okko",
+        "wink",
+        "kion",
+        "roblox",
+        "ozon",
+        "wildberries",
+        "aliexpress"
+      ]
+    }
+  ]
+}

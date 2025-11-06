@@ -1,94 +1,80 @@
-﻿# Генератор правил для Mihomo
+# Генератор ruleset'ов для Mihomo
 
-Проект помогает собрать собственный список доменов и преобразовать его в формат YAML и бинарный `.mrs` для использования в Mihomo (Clash Meta).
+Репозиторий хранит исходники правил в формате JSON и автоматически собирает из них YAML‑файлы и бинарные `.mrs`, пригодные для использования в Mihomo (Clash Meta). Сборка может выполняться локально через `python scripts/build.py` или автоматически в GitHub Actions.
 
-## Структура
+## Структура проекта
 
-- `domains/` — исходные списки доменов (`.txt`, один домен в строке).
-- `scripts/` — утилиты для сборки.
-- `output/` — сюда складываются готовые файлы (`.yaml`, `.mrs`).
+- `sources/domain/` — JSON c поведением `domain`. Пример: `tiktok.json`.
+- `sources/classical/` — JSON для классических правил (`behavior: classical`). Пример: `russian-services.json`.
+- `scripts/build.py` — основной скрипт генерации.
+- `output/domain/` и `output/classical/` — результаты (`.yaml`, `.mrs`, для доменных списков дополнительно `.list`).
 
-## Быстрый старт
+## Формат JSON
 
-1. Отредактируйте файл `domains/common.txt` или создайте свои списки в каталоге `domains/`.
-2. Запустите скрипт сборки (см. ниже). Он подготовит YAML и при наличии бинарника `mihomo` соберёт `.mrs`.
-3. Используйте `output/my-domains.yaml` или `output/my-domains.mrs` в своём конфиге Mihomo.
+Каждый файл выглядит так:
 
-## Скрипты сборки
-
-### Windows / PowerShell
-
-```powershell
-pwsh -File ./scripts/build.ps1 -ListPath ./domains/common.txt -OutputName my-domains
+```jsonc
+{
+  "version": 1,
+  "rules": [
+    {
+      "domain_suffix": ["example.com", "example.org"],
+      "domain": ["api.example.net"],
+      "domain_keyword": ["shop"]
+    }
+  ]
+}
 ```
 
-### Linux / macOS
+Допустимые ключи в `rules`:
 
-```bash
-bash ./scripts/build.sh --list ./domains/common.txt --output my-domains
-```
+- `domain_suffix`, `domain`, `domain_keyword`
+- `domain_regex`, `domain_keyword_regex`
+- `ip_cidr`, `ip_cidr6`
+- `process_name`, `process_name_regex`
+- `payload` — если нужно добавить готовую строку вида `DOMAIN-SUFFIX,example.com`
 
-Оба скрипта:
-- читают домены, фильтруют пустые строки и комментарии (`#`),
-- формируют YAML с префиксом `+.`,
-- пытаются вызвать `mihomo convert-ruleset` для генерации `.mrs` (если `mihomo` есть в `PATH` или путь передан явно).
+Для доменных списков (`sources/domain`) используются только `domain_suffix`/`domain`. Для классических правил допускаются все поля, которые поддерживает Mihomo. **Строки вида `DOMAIN-SUFFIX,.ru` запрещены** — движок Mihomo не умеет обрабатывать wildcard для целых TLD и аварийно завершает работу.
 
-## Зависимости
+## Локальная сборка
 
-- Установленный `mihomo` (версия не ниже 1.18). Если бинарник лежит не в `PATH`, передайте путь опцией `-MihomoPath` (PowerShell) или `--mihomo` (bash).
-- PowerShell 7+ или совместимый (для Windows можно использовать `pwsh`, но скрипт должен работать и в Windows PowerShell 5.1).
+1. Установите `mihomo` и добавьте бинарник в `PATH`.
+2. (Опционально) установите виртуальное окружение Python ≥3.8.
+3. Выполните:
+   ```bash
+   python scripts/build.py
+   ```
+4. Готовые файлы появятся в `output/domain/` и `output/classical/`.
 
-## Формат входных файлов
+### Примеры результирующих файлов
 
-- Одна строка — один домен (например, `example.com`).
-- Пустые строки и строки, начинающиеся с `#`, игнорируются.
-- Чтобы добавить конкретный поддомен, укажите его напрямую (`sub.example.com`). Для wildcard используйте только корневой домен — скрипт сам добавит `+.example.com`.
-
-## Выходные файлы
-
-- `output/<имя>.yaml` — YAML со структурой:
-  ```yaml
-  payload:
-    - '+.example.com'
-    - '+.example.org'
-  ```
-- `output/<имя>.mrs` — бинарный ruleset, если удалось запустить `mihomo convert-ruleset`.
-
-## Проверка результата
-
-Если требуется убедиться, что `.mrs` корректный, выполните:
-
-```bash
-mihomo convert-ruleset domain mrs ./output/my-domains.mrs /dev/null
-```
-
-Команда завершится без ошибок, если файл валиден.
-
-## Что дальше
-
-- Добавьте новые списки в `domains/` и укажите их скрипту.
-- Настройте GitHub Actions по образцу [legiz-ru/mihomo-rule-sets](https://github.com/legiz-ru/mihomo-rule-sets), чтобы автоматизировать сборку.
-- Интегрируйте готовые файлы в ваш конфиг Clash Meta/Mihomo, используя `rule-providers`.
+- `output/domain/tiktok.yaml` / `output/domain/tiktok.mrs` / `output/domain/tiktok.list`
+- `output/classical/russian-services.yaml` / `output/classical/russian-services.mrs`
 
 ## GitHub Actions
 
-В репозитории есть workflow `.github/workflows/build.yml`, который:
+Workflow `.github/workflows/build.yml`:
+
 - запускается на push, pull request и вручную (`workflow_dispatch`);
-- устанавливает `mihomo` и прогоняет скрипт `scripts/build.sh` для каждого `.txt` в `domains/`;
-- складывает результирующие `.yaml` и `.mrs` в каталог `output/` и публикует их артефактами (`mihomo-rulesets`).
-- при запуске не из pull request создаёт GitHub Release с актуальными файлами (последний доступен по ссылке вида `https://github.com/<owner>/<repo>/releases/latest/download/<имя_файла>`).
-- синхронизирует содержимое `output/` в ветку `raw`, откуда файлы доступны по прямым ссылкам `https://raw.githubusercontent.com/<owner>/<repo>/raw/<имя_файла>`.
-- автоматически конвертирует `.yaml` из каталога `rules/` в классический `.mrs` и складывает их в `output/classical/`.
+- устанавливает `mihomo`, запускает `python scripts/build.py`;
+- публикует артефакт `mihomo-rulesets` (все `.yaml/.mrs/.list`);
+- создает GitHub Release с актуальными файлами;
+- синхронизирует каталог `output/` в ветку `raw` для прямого доступа (`https://raw.githubusercontent.com/<owner>/<repo>/raw/...`).
 
-Получить артефакты можно на вкладке **Actions** в выбранном прогоне.
+> ⚠️ В настройках репозитория Actions → General → Workflow permissions должна быть включена опция «Read and write permissions» (workflow уже содержит `permissions: contents: write`).
 
-> ⚠️ Для публикации релизов нужно, чтобы в настройках репозитория Actions → General → Workflow permissions была включена опция «Read and write permissions» (или явно задано `permissions: contents: write` в workflow — уже сделано в `build.yml`).
+## Добавление новых правил
 
-## Дополнительные списки
+1. Создайте JSON в `sources/domain/` или `sources/classical/` по примеру выше.
+2. Сделайте commit/push или запустите `python scripts/build.py`.
+3. После успешного прогона workflow файлы будут доступны:
+   - как артефакт `mihomo-rulesets`;
+   - в релизах (`Releases` → `Latest`);
+   - по прямым ссылкам, например  
+     `https://raw.githubusercontent.com/mrtesla07/mihomo-custom-rules/raw/domain/tiktok.yaml`  
+     `https://raw.githubusercontent.com/mrtesla07/mihomo-custom-rules/raw/classical/russian-services.mrs`.
 
-- `rules/russian-services.yaml` — пример классического ruleset’а с `DOMAIN-SUFFIX` и `DOMAIN-KEYWORD` для сервисов, которые хочется направлять по особому маршруту. Такой файл можно подключить как `behavior: classical` без дополнительной конвертации.
-- После сборки workflow кладёт подготовленные файлы в:
-  - `output/classical/russian-services.yaml`
-  - `output/classical/russian-services.mrs`
-  Их можно скачать по ссылкам вида `https://raw.githubusercontent.com/<owner>/<repo>/raw/classical/russian-services.mrs`.
-  > Не добавляйте записи вида `DOMAIN-SUFFIX,.ru` — `mihomo convert-ruleset` не поддерживает такую форму и аварийно завершается, поэтому все записи оставлены только для конкретных доменов/keyword.
+## Полезные ссылки
+
+- [Документация Mihomo по ruleset](https://wiki.metacubex.one/Rules/rule_set/)
+- [legiz-ru/sb-rule-sets](https://github.com/legiz-ru/sb-rule-sets) — пример автоматизации и агрегации списков в формате sing-box. Многие идеи позаимствованы оттуда.

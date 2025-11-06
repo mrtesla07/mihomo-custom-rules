@@ -22,43 +22,25 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y curl bash
+          sudo apt-get install -y curl python3
 
       - name: Install mihomo ${{ env.MIHOMO_VERSION }}
         run: |
           curl -L "https://github.com/MetaCubeX/mihomo/releases/download/${{ env.MIHOMO_VERSION }}/mihomo-linux-amd64-${{ env.MIHOMO_VERSION }}.deb" -o mihomo.deb
           sudo apt-get install -y ./mihomo.deb
 
-      - name: Prepare scripts
-        run: |
-          chmod +x scripts/build.sh
-
       - name: Build rule sets
         run: |
-          mkdir -p output
-          for list in domains/*.txt; do
-            name="$(basename "$list" .txt)"
-            echo "Building from $list -> $name"
-            bash scripts/build.sh --list "$list" --output "$name"
-          done
-          echo "Converting classical rulesets"
-          mkdir -p output/classical
-          shopt -s nullglob
-          for yaml in rules/*.yaml; do
-            name="$(basename "$yaml" .yaml)"
-            echo "Processing $yaml -> $name"
-            cp "$yaml" "output/classical/${name}.yaml"
-            mihomo convert-ruleset classical yaml "$yaml" "output/classical/${name}.mrs"
-          done
-          shopt -u nullglob
+          python3 scripts/build.py
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: mihomo-rulesets
           path: |
-            output/*.yaml
-            output/*.mrs
+            output/domain/*.yaml
+            output/domain/*.mrs
+            output/domain/*.list
             output/classical/*.yaml
             output/classical/*.mrs
           if-no-files-found: error
@@ -79,8 +61,9 @@ jobs:
           body: |
             Автоматическая сборка правил от ${{ steps.release_meta.outputs.timestamp }}.
           files: |
-            output/*.yaml
-            output/*.mrs
+            output/domain/*.yaml
+            output/domain/*.mrs
+            output/domain/*.list
             output/classical/*.yaml
             output/classical/*.mrs
           make_latest: true

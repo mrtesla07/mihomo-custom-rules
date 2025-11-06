@@ -79,3 +79,5 @@ mihomo convert-ruleset domain mrs ./output/my-domains.mrs /dev/null
 - при запуске не из pull request создаёт GitHub Release с актуальными файлами (последний доступен по ссылке вида `https://github.com/<owner>/<repo>/releases/latest/download/<имя_файла>`).
 
 Получить артефакты можно на вкладке **Actions** в выбранном прогоне.
+
+> ⚠️ Для публикации релизов нужно, чтобы в настройках репозитория Actions → General → Workflow permissions была включена опция «Read and write permissions» (или явно задано `permissions: contents: write` в workflow — уже сделано в `build.yml`).

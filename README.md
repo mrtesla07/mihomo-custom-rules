@@ -91,3 +91,4 @@ mihomo convert-ruleset domain mrs ./output/my-domains.mrs /dev/null
   - `output/classical/russian-services.yaml`
   - `output/classical/russian-services.mrs`
   Их можно скачать по ссылкам вида `https://raw.githubusercontent.com/<owner>/<repo>/raw/classical/russian-services.mrs`.
+  > Не добавляйте записи вида `DOMAIN-SUFFIX,.ru` — `mihomo convert-ruleset` не поддерживает такую форму и аварийно завершается, поэтому все записи оставлены только для конкретных доменов/keyword.

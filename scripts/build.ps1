@@ -33,6 +33,7 @@ $domains = @()
 
 foreach ($line in $rawLines) {
     $clean = ($line -replace '\r', '').Trim()
+    $clean = $clean.TrimStart([char]0xFEFF)
     if ([string]::IsNullOrWhiteSpace($clean)) { continue }
     if ($clean.StartsWith('#')) { continue }
     $domains += $clean.ToLowerInvariant()
@@ -48,9 +49,11 @@ $yamlPath = Join-Path $outputDir "$OutputName.yaml"
 $listPath = Join-Path $outputDir "$OutputName.list"
 $mrsPath = Join-Path $outputDir "$OutputName.mrs"
 
-"payload:" | Set-Content -LiteralPath $yamlPath -Encoding utf8
-$domains | ForEach-Object { "  - '+.$_'" } | Add-Content -LiteralPath $yamlPath -Encoding utf8
-$domains | ForEach-Object { '+.' + $_ } | Set-Content -LiteralPath $listPath -Encoding utf8
+$yamlLines = @("payload:") + ($domains | ForEach-Object { "  - '+.$_'" })
+$listLines = $domains | ForEach-Object { '+.' + $_ }
+$encoding = [System.Text.UTF8Encoding]::new($false)
+[System.IO.File]::WriteAllLines($yamlPath, $yamlLines, $encoding)
+[System.IO.File]::WriteAllLines($listPath, $listLines, $encoding)
 
 $resolvedMihomo = $null
 if ($PSBoundParameters.ContainsKey('MihomoPath') -and -not [string]::IsNullOrWhiteSpace($MihomoPath)) {

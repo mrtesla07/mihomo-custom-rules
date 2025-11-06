@@ -41,6 +41,7 @@ mapfile -t RAW_LINES < "$LIST_PATH"
 DOMAINS=()
 for line in "${RAW_LINES[@]}"; do
   clean="$(echo "$line" | tr -d '\r' | xargs)"
+  clean="${clean#$'\ufeff'}"
   if [[ -z "$clean" ]]; then
     continue
   fi

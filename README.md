@@ -82,3 +82,7 @@ mihomo convert-ruleset domain mrs ./output/my-domains.mrs /dev/null
 Получить артефакты можно на вкладке **Actions** в выбранном прогоне.
 
 > ⚠️ Для публикации релизов нужно, чтобы в настройках репозитория Actions → General → Workflow permissions была включена опция «Read and write permissions» (или явно задано `permissions: contents: write` в workflow — уже сделано в `build.yml`).
+
+## Дополнительные списки
+
+- `rules/russian-services.yaml` — пример классического ruleset’а с `DOMAIN-SUFFIX` и `DOMAIN-KEYWORD` для сервисов, которые хочется направлять по особому маршруту. Такой файл можно подключить как `behavior: classical` без дополнительной конвертации.

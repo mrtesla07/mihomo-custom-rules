@@ -72,3 +72,13 @@ jobs:
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish raw branch
+        if: github.event_name != 'pull_request'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: raw
+          publish_dir: output
+          force_orphan: true
+          commit_message: "ci: update compiled rulesets (${{ steps.release_meta.outputs.tag }})"

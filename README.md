@@ -78,6 +78,7 @@ mihomo convert-ruleset domain mrs ./output/my-domains.mrs /dev/null
 - складывает результирующие `.yaml` и `.mrs` в каталог `output/` и публикует их артефактами (`mihomo-rulesets`).
 - при запуске не из pull request создаёт GitHub Release с актуальными файлами (последний доступен по ссылке вида `https://github.com/<owner>/<repo>/releases/latest/download/<имя_файла>`).
 - синхронизирует содержимое `output/` в ветку `raw`, откуда файлы доступны по прямым ссылкам `https://raw.githubusercontent.com/<owner>/<repo>/raw/<имя_файла>`.
+- автоматически конвертирует `.yaml` из каталога `rules/` в классический `.mrs` и складывает их в `output/classical/`.
 
 Получить артефакты можно на вкладке **Actions** в выбранном прогоне.
 
@@ -86,3 +87,7 @@ mihomo convert-ruleset domain mrs ./output/my-domains.mrs /dev/null
 ## Дополнительные списки
 
 - `rules/russian-services.yaml` — пример классического ruleset’а с `DOMAIN-SUFFIX` и `DOMAIN-KEYWORD` для сервисов, которые хочется направлять по особому маршруту. Такой файл можно подключить как `behavior: classical` без дополнительной конвертации.
+- После сборки workflow кладёт подготовленные файлы в:
+  - `output/classical/russian-services.yaml`
+  - `output/classical/russian-services.mrs`
+  Их можно скачать по ссылкам вида `https://raw.githubusercontent.com/<owner>/<repo>/raw/classical/russian-services.mrs`.

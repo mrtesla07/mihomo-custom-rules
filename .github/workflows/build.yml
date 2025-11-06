@@ -41,6 +41,16 @@ jobs:
             echo "Building from $list -> $name"
             bash scripts/build.sh --list "$list" --output "$name"
           done
+          echo "Converting classical rulesets"
+          mkdir -p output/classical
+          shopt -s nullglob
+          for yaml in rules/*.yaml; do
+            name="$(basename "$yaml" .yaml)"
+            echo "Processing $yaml -> $name"
+            cp "$yaml" "output/classical/${name}.yaml"
+            mihomo convert-ruleset classical yaml "$yaml" "output/classical/${name}.mrs"
+          done
+          shopt -u nullglob
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -49,6 +59,8 @@ jobs:
           path: |
             output/*.yaml
             output/*.mrs
+            output/classical/*.yaml
+            output/classical/*.mrs
           if-no-files-found: error
 
       - name: Prepare release metadata
@@ -69,6 +81,8 @@ jobs:
           files: |
             output/*.yaml
             output/*.mrs
+            output/classical/*.yaml
+            output/classical/*.mrs
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

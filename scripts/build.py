@@ -32,7 +32,14 @@ def normalize_keyword(value: str) -> str:
     return value.strip().lower()
 
 
-def convert_mrs(behavior: str, input_format: str, source_path: Path, mrs_path: Path) -> None:
+def convert_mrs(
+    behavior: str,
+    input_format: str,
+    source_path: Path,
+    mrs_path: Path,
+    *,
+    allow_failure: bool = False,
+) -> None:
     try:
         subprocess.run(
             [
@@ -48,6 +55,14 @@ def convert_mrs(behavior: str, input_format: str, source_path: Path, mrs_path: P
     except FileNotFoundError as err:
         raise SystemExit("mihomo не найден в PATH. Установите бинарник перед сборкой.") from err
     except subprocess.CalledProcessError as err:
+        if allow_failure:
+            print(
+                f"Предупреждение: mihomo convert-ruleset ({behavior}) завершился с ошибкой, .mrs не будет создан: {err}",
+                file=sys.stderr,
+            )
+            if mrs_path.exists():
+                mrs_path.unlink()
+            return
         raise SystemExit(f"mihomo convert-ruleset завершился с ошибкой: {err}") from err
 
 
@@ -169,8 +184,8 @@ def process_classical_sources() -> None:
 
         write_lines(yaml_path, yaml_lines)
         write_lines(text_path, text_lines)
-        convert_mrs("classical", "text", text_path, mrs_path)
-        print(f"Собран classical ruleset: {name}")
+        convert_mrs("classical", "text", text_path, mrs_path, allow_failure=True)
+        print(f"Собран classical ruleset: {name}{'' if mrs_path.exists() else ' (без .mrs)'}")
 
 
 def main() -> None:

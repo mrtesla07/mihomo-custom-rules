@@ -49,7 +49,7 @@
 ### Примеры результирующих файлов
 
 - `output/domain/tiktok.yaml` / `output/domain/tiktok.mrs` / `output/domain/tiktok.list`
-- `output/classical/russian-services.yaml` / `output/classical/russian-services.txt` / `output/classical/russian-services.mrs`
+- `output/classical/russian-services.yaml` / `output/classical/russian-services.txt` (+ `.mrs`, если конвертер Mihomo отработал успешно; при ошибке `.mrs` не создаётся, смотрите предупреждение в логе)
 
 ## GitHub Actions
 
@@ -62,6 +62,8 @@ Workflow `.github/workflows/build.yml`:
 - синхронизирует каталог `output/` в ветку `raw` для прямого доступа (`https://raw.githubusercontent.com/<owner>/<repo>/raw/...`).
 
 > ⚠️ В настройках репозитория Actions → General → Workflow permissions должна быть включена опция «Read and write permissions» (workflow уже содержит `permissions: contents: write`).
+
+> ℹ️ У Mihomo есть баг: конвертация больших classical-листов иногда падает с `SIGSEGV`. Скрипт отмечает такую ситуацию предупреждением и просто не создаёт `.mrs`. Это ожидаемое поведение до тех пор, пока upstream не исправит проблему.
 
 ## Добавление новых правил
 

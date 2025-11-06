@@ -44,7 +44,7 @@ jobs:
             output/classical/*.yaml
             output/classical/*.txt
             output/classical/*.mrs
-          if-no-files-found: error
+          if-no-files-found: warn
 
       - name: Prepare release metadata
         if: github.event_name != 'pull_request'

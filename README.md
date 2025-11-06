@@ -7,7 +7,7 @@
 - `sources/domain/` — JSON c поведением `domain`. Пример: `tiktok.json`.
 - `sources/classical/` — JSON для классических правил (`behavior: classical`). Пример: `russian-services.json`.
 - `scripts/build.py` — основной скрипт генерации.
-- `output/domain/` и `output/classical/` — результаты (`.yaml`, `.mrs`, для доменных списков дополнительно `.list`).
+- `output/domain/` и `output/classical/` — результаты (`.yaml`, `.mrs`, для доменных списков дополнительно `.list`, для classical ещё `.txt`).
 
 ## Формат JSON
 
@@ -49,7 +49,7 @@
 ### Примеры результирующих файлов
 
 - `output/domain/tiktok.yaml` / `output/domain/tiktok.mrs` / `output/domain/tiktok.list`
-- `output/classical/russian-services.yaml` / `output/classical/russian-services.mrs`
+- `output/classical/russian-services.yaml` / `output/classical/russian-services.txt` / `output/classical/russian-services.mrs`
 
 ## GitHub Actions
 

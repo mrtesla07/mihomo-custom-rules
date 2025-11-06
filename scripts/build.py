@@ -32,15 +32,15 @@ def normalize_keyword(value: str) -> str:
     return value.strip().lower()
 
 
-def convert_mrs(behavior: str, yaml_path: Path, mrs_path: Path) -> None:
+def convert_mrs(behavior: str, input_format: str, source_path: Path, mrs_path: Path) -> None:
     try:
         subprocess.run(
             [
                 "mihomo",
                 "convert-ruleset",
                 behavior,
-                "yaml",
-                str(yaml_path),
+                input_format,
+                str(source_path),
                 str(mrs_path),
             ],
             check=True,
@@ -95,7 +95,7 @@ def process_domain_sources() -> None:
 
         write_lines(yaml_path, yaml_lines)
         write_lines(list_path, list_lines)
-        convert_mrs("domain", yaml_path, mrs_path)
+        convert_mrs("domain", "yaml", yaml_path, mrs_path)
         print(f"Собран доменный ruleset: {name}")
 
 
@@ -162,11 +162,14 @@ def process_classical_sources() -> None:
 
         name = source.stem
         yaml_path = output_dir / f"{name}.yaml"
+        text_path = output_dir / f"{name}.txt"
         mrs_path = output_dir / f"{name}.mrs"
         yaml_lines = ["payload:"] + [f"  - {entry}" for entry in payload_entries]
+        text_lines = payload_entries
 
         write_lines(yaml_path, yaml_lines)
-        convert_mrs("classical", yaml_path, mrs_path)
+        write_lines(text_path, text_lines)
+        convert_mrs("classical", "text", text_path, mrs_path)
         print(f"Собран classical ruleset: {name}")
 
 

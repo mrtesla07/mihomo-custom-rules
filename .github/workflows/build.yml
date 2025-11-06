@@ -47,3 +47,25 @@ jobs:
             output/*.yaml
             output/*.mrs
           if-no-files-found: error
+
+      - name: Prepare release metadata
+        if: github.event_name != 'pull_request'
+        id: release_meta
+        run: |
+          echo "tag=rules-$(date -u +'%Y%m%d-%H%M%S')" >> "$GITHUB_OUTPUT"
+          echo "timestamp=$(TZ=Europe/Moscow date +'%Y-%m-%d %H:%M:%S %Z')" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub Release
+        if: github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_meta.outputs.tag }}
+          name: Ruleset ${{ steps.release_meta.outputs.tag }}
+          body: |
+            Автоматическая сборка правил от ${{ steps.release_meta.outputs.timestamp }}.
+          files: |
+            output/*.yaml
+            output/*.mrs
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

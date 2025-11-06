@@ -76,5 +76,6 @@ mihomo convert-ruleset domain mrs ./output/my-domains.mrs /dev/null
 - запускается на push, pull request и вручную (`workflow_dispatch`);
 - устанавливает `mihomo` и прогоняет скрипт `scripts/build.sh` для каждого `.txt` в `domains/`;
 - складывает результирующие `.yaml` и `.mrs` в каталог `output/` и публикует их артефактами (`mihomo-rulesets`).
+- при запуске не из pull request создаёт GitHub Release с актуальными файлами (последний доступен по ссылке вида `https://github.com/<owner>/<repo>/releases/latest/download/<имя_файла>`).
 
 Получить артефакты можно на вкладке **Actions** в выбранном прогоне.
